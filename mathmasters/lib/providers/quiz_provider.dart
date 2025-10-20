@@ -94,7 +94,7 @@ class QuizNotifier extends StateNotifier<QuizState?> {
   final Ref ref;
   Timer? _timer;
 
-  int _timeForLevel(int level) => (600 - (level - 1) * 15).clamp(60, 600);
+  int _timeForLevel(int level) => (300 - (level - 1) * 5).clamp(60, 300);
 
   Future<void> startQuiz({
     required List<Topic> topics,
