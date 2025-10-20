@@ -1,0 +1,36 @@
+{
+  "addition": {
+    "level1": [
+      { "question": "5 + 3 = ?", "options": ["6", "7", "8", "9"], "answerIndex": 2 },
+      { "question": "2 + 9 = ?", "options": ["11", "12", "13", "10"], "answerIndex": 0 }
+    ],
+    "level2": [
+      { "question": "15 + 27 = ?", "options": ["32", "42", "43", "40"], "answerIndex": 1 }
+    ]
+  },
+  "subtraction": {
+    "level1": [
+      { "question": "8 - 5 = ?", "options": ["2", "3", "4", "5"], "answerIndex": 1 }
+    ]
+  },
+  "multiplication": {
+    "level1": [
+      { "question": "4 × 3 = ?", "options": ["6", "9", "12", "8"], "answerIndex": 2 }
+    ]
+  },
+  "division": {
+    "level1": [
+      { "question": "12 ÷ 3 = ?", "options": ["2", "3", "4", "6"], "answerIndex": 2 }
+    ]
+  },
+  "fractions": {
+    "level1": [
+      { "question": "Which is 1/2?", "options": ["0.2", "0.5", "0.8", "0.25"], "answerIndex": 1 }
+    ]
+  },
+  "decimals": {
+    "level1": [
+      { "question": "0.7 + 0.2 = ?", "options": ["0.8", "0.9", "1.0", "0.6"], "answerIndex": 1 }
+    ]
+  }
+}
