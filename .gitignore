@@ -1,0 +1,3 @@
+# Allow releases directory for APK files
+!releases/
+!releases/*.apk

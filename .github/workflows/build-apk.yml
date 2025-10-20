@@ -1,0 +1,71 @@
+name: Build and Commit APK
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
+      - master
+
+jobs:
+  build:
+    # Only run on merge to main/master
+    if: github.event_name == 'push' || (github.event.pull_request.merged == true)
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+      
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+      
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          channel: 'stable'
+      
+      - name: Install dependencies
+        working-directory: ./mathmasters
+        run: flutter pub get
+      
+      - name: Build APK
+        working-directory: ./mathmasters
+        run: flutter build apk --release
+      
+      - name: Create releases directory
+        run: mkdir -p releases
+      
+      - name: Copy APK to releases
+        run: |
+          TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+          cp mathmasters/build/app/outputs/flutter-apk/app-release.apk releases/mathmasters-${TIMESTAMP}.apk
+          cp mathmasters/build/app/outputs/flutter-apk/app-release.apk releases/mathmasters-latest.apk
+          echo "APK_TIMESTAMP=${TIMESTAMP}" >> $GITHUB_ENV
+      
+      - name: Configure Git
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+      
+      - name: Commit APK
+        run: |
+          git add releases/
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "ci: add APK build from ${{ github.sha }} (${APK_TIMESTAMP})"
+            git push
+          fi
