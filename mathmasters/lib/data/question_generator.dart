@@ -66,18 +66,30 @@ class QuestionGenerator {
           return _genDivisionWithRemainder(level);
         }
       case Topic.decimals:
-        // 80% standard, 20% comparison
-        if (formatChoice < 80) {
+        // Increased variety: 50% standard, 20% comparison, 15% multiplication, 15% division
+        if (formatChoice < 50) {
           return _genDecimals(level);
-        } else {
+        } else if (formatChoice < 70) {
           return _genDecimalsComparison(level);
+        } else if (formatChoice < 85) {
+          return _genDecimalsMultiplication(level);
+        } else {
+          return _genDecimalsDivision(level);
         }
       case Topic.fractions:
-        // 70% standard, 30% comparison
-        if (formatChoice < 70) {
+        // Increased variety: 40% standard, 15% comparison, 15% like fractions, 15% unlike fractions, 10% multiplication, 5% division
+        if (formatChoice < 40) {
           return _genFractions(level);
-        } else {
+        } else if (formatChoice < 55) {
           return _genFractionsComparison(level);
+        } else if (formatChoice < 70) {
+          return _genLikeFractions(level);
+        } else if (formatChoice < 85) {
+          return _genUnlikeFractions(level);
+        } else if (formatChoice < 95) {
+          return _genFractionsMultiplication(level);
+        } else {
+          return _genFractionsDivision(level);
         }
     }
   }
@@ -92,7 +104,8 @@ class QuestionGenerator {
     final formatVariant = _rand.nextInt(3);
     
     if (level >= 15) {
-      final lim = _rangeMax(level, base: 50, step: 25, cap: 500);
+      // Higher numbers: up to 1000
+      final lim = _rangeMax(level, base: 100, step: 50, cap: 1000);
       final a = _rand.nextInt(lim + 1);
       final b = _rand.nextInt(lim + 1);
       final c = _rand.nextInt(lim + 1);
@@ -109,7 +122,7 @@ class QuestionGenerator {
       
       final options = _shuffleOptions(
         ans,
-        () => ans + (_rand.nextInt(41) - 20),
+        () => ans + (_rand.nextInt(81) - 40),
       );
       return Question(
         question: q,
@@ -117,10 +130,11 @@ class QuestionGenerator {
         answerIndex: options.$2,
       );
     } else if (level >= 8) {
-      final lim = _rangeMax(level, base: 20, step: 15, cap: 300);
+      // Medium numbers: up to 500
+      final lim = _rangeMax(level, base: 50, step: 30, cap: 500);
       final a = _rand.nextInt(lim + 1);
       final b = _rand.nextInt(lim + 1);
-      final c = _rand.nextInt(20);
+      final c = _rand.nextInt(50);
       final ans = a + b + c;
       
       String q;
@@ -134,7 +148,7 @@ class QuestionGenerator {
       
       final options = _shuffleOptions(
         ans,
-        () => ans + (_rand.nextInt(21) - 10),
+        () => ans + (_rand.nextInt(41) - 20),
       );
       return Question(
         question: q,
@@ -142,7 +156,8 @@ class QuestionGenerator {
         answerIndex: options.$2,
       );
     } else {
-      final lim = _rangeMax(level, base: 10, step: 10, cap: 200);
+      // Basic numbers: up to 200
+      final lim = _rangeMax(level, base: 20, step: 20, cap: 200);
       final a = _rand.nextInt(lim + 1);
       final b = _rand.nextInt(lim + 1);
       final ans = a + b;
@@ -156,7 +171,7 @@ class QuestionGenerator {
         q = 'Add: $a + $b';
       }
       
-      final options = _shuffleOptions(ans, () => ans + _rand.nextInt(9) - 4);
+      final options = _shuffleOptions(ans, () => ans + _rand.nextInt(15) - 7);
       return Question(
         question: q,
         options: options.$1,
@@ -169,10 +184,11 @@ class QuestionGenerator {
     final formatVariant = _rand.nextInt(3);
     
     if (level >= 12) {
-      final lim = _rangeMax(level, base: 50, step: 25, cap: 500);
+      // Higher numbers: up to 1000
+      final lim = _rangeMax(level, base: 100, step: 50, cap: 1000);
       final a = _rand.nextInt(lim + 1);
       final b = _rand.nextInt(lim + 1);
-      final c = _rand.nextInt(20);
+      final c = _rand.nextInt(50);
       final x = a + b + c;
       final pick = _rand.nextInt(2) == 0 ? a : b;
       final ans = x - pick;
@@ -188,7 +204,7 @@ class QuestionGenerator {
       
       final options = _shuffleOptions(
         ans,
-        () => ans + (_rand.nextInt(41) - 20),
+        () => ans + (_rand.nextInt(81) - 40),
       );
       return Question(
         question: q,
@@ -196,7 +212,8 @@ class QuestionGenerator {
         answerIndex: options.$2,
       );
     } else {
-      final lim = _rangeMax(level, base: 10, step: 10, cap: 200);
+      // Basic to medium numbers
+      final lim = _rangeMax(level, base: 20, step: 20, cap: 500);
       final a = _rand.nextInt(lim + 1);
       final b = _rand.nextInt(a + 1); // ensure non-negative
       final ans = a - b;
@@ -210,7 +227,7 @@ class QuestionGenerator {
         q = 'What is the difference: $a - $b';
       }
       
-      final options = _shuffleOptions(ans, () => m.max(0, ans + _rand.nextInt(9) - 4));
+      final options = _shuffleOptions(ans, () => m.max(0, ans + _rand.nextInt(15) - 7));
       return Question(
         question: q,
         options: options.$1,
@@ -343,62 +360,116 @@ class QuestionGenerator {
   }
 
   Question _genDecimals(int level) {
+    // Vary operations and decimal places based on level
+    final operation = _rand.nextInt(3); // 0: add, 1: subtract, 2: multiply by integer
+    
     if (level <= 5) {
-      // 1 decimal place addition
+      // 1 decimal place addition/subtraction
       const places = 1;
       const scale = 10;
       final a = _rand.nextInt(100) / scale;
-      final b = _rand.nextInt(100) / scale;
-      final ans = ((a + b) * scale).round() / scale;
-      final q =
-          '${a.toStringAsFixed(places)} + ${b.toStringAsFixed(places)} = ?';
-      final opts = <double>{ans};
-      while (opts.length < 4) {
-        final v = ans + (_rand.nextInt(7) - 3) / scale;
-        opts.add(((v) * scale).round() / scale);
+      
+      if (operation == 0) {
+        // Addition
+        final b = _rand.nextInt(100) / scale;
+        final ans = ((a + b) * scale).round() / scale;
+        final q = '${a.toStringAsFixed(places)} + ${b.toStringAsFixed(places)} = ?';
+        final opts = <double>{ans};
+        while (opts.length < 4) {
+          final v = ans + (_rand.nextInt(7) - 3) / scale;
+          opts.add(((v) * scale).round() / scale);
+        }
+        final list = opts.map((e) => e.toStringAsFixed(places)).toList()
+          ..shuffle(_rand);
+        final idx = list.indexOf(ans.toStringAsFixed(places));
+        return Question(question: q, options: list, answerIndex: idx);
+      } else {
+        // Subtraction, non-negative
+        final b = _rand.nextInt((a * scale).toInt() + 1) / scale; // ensure b <= a
+        final ans = ((a - b) * scale).round() / scale;
+        final q = '${a.toStringAsFixed(places)} - ${b.toStringAsFixed(places)} = ?';
+        final opts = <double>{ans};
+        while (opts.length < 4) {
+          final v = ans + (_rand.nextInt(7) - 3) / scale;
+          opts.add(((v) * scale).round() / scale);
+        }
+        final list = opts.map((e) => e.toStringAsFixed(places)).toList()
+          ..shuffle(_rand);
+        final idx = list.indexOf(ans.toStringAsFixed(places));
+        return Question(question: q, options: list, answerIndex: idx);
       }
-      final list = opts.map((e) => e.toStringAsFixed(places)).toList()
-        ..shuffle(_rand);
-      final idx = list.indexOf(ans.toStringAsFixed(places));
-      return Question(question: q, options: list, answerIndex: idx);
     } else if (level <= 10) {
-      // 1 decimal place subtraction, non-negative
-      const places = 1;
-      const scale = 10;
-      final a = _rand.nextInt(100) / scale;
-      final b = _rand.nextInt((a * scale).toInt() + 1) / scale; // ensure b <= a
-      final ans = ((a - b) * scale).round() / scale;
-      final q =
-          '${a.toStringAsFixed(places)} - ${b.toStringAsFixed(places)} = ?';
-      final opts = <double>{ans};
-      while (opts.length < 4) {
-        final v = ans + (_rand.nextInt(7) - 3) / scale;
-        opts.add(((v) * scale).round() / scale);
-      }
-      final list = opts.map((e) => e.toStringAsFixed(places)).toList()
-        ..shuffle(_rand);
-      final idx = list.indexOf(ans.toStringAsFixed(places));
-      return Question(question: q, options: list, answerIndex: idx);
-    } else if (level <= 15) {
-      // 2 decimal places addition
+      // 2 decimal places addition/subtraction
       const places = 2;
       const scale = 100;
       final a = _rand.nextInt(1000) / scale;
-      final b = _rand.nextInt(1000) / scale;
-      final ans = ((a + b) * scale).round() / scale;
-      final q =
-          '${a.toStringAsFixed(places)} + ${b.toStringAsFixed(places)} = ?';
-      final opts = <double>{ans};
-      while (opts.length < 4) {
-        final v = ans + (_rand.nextInt(7) - 3) / scale;
-        opts.add(((v) * scale).round() / scale);
+      
+      if (operation == 0) {
+        // Addition
+        final b = _rand.nextInt(1000) / scale;
+        final ans = ((a + b) * scale).round() / scale;
+        final q = '${a.toStringAsFixed(places)} + ${b.toStringAsFixed(places)} = ?';
+        final opts = <double>{ans};
+        while (opts.length < 4) {
+          final v = ans + (_rand.nextInt(9) - 4) / scale;
+          opts.add(((v) * scale).round() / scale);
+        }
+        final list = opts.map((e) => e.toStringAsFixed(places)).toList()
+          ..shuffle(_rand);
+        final idx = list.indexOf(ans.toStringAsFixed(places));
+        return Question(question: q, options: list, answerIndex: idx);
+      } else {
+        // Subtraction
+        final b = _rand.nextInt((a * scale).toInt() + 1) / scale;
+        final ans = ((a - b) * scale).round() / scale;
+        final q = '${a.toStringAsFixed(places)} - ${b.toStringAsFixed(places)} = ?';
+        final opts = <double>{ans};
+        while (opts.length < 4) {
+          final v = ans + (_rand.nextInt(9) - 4) / scale;
+          opts.add(((v) * scale).round() / scale);
+        }
+        final list = opts.map((e) => e.toStringAsFixed(places)).toList()
+          ..shuffle(_rand);
+        final idx = list.indexOf(ans.toStringAsFixed(places));
+        return Question(question: q, options: list, answerIndex: idx);
       }
-      final list = opts.map((e) => e.toStringAsFixed(places)).toList()
-        ..shuffle(_rand);
-      final idx = list.indexOf(ans.toStringAsFixed(places));
-      return Question(question: q, options: list, answerIndex: idx);
+    } else if (level <= 15) {
+      // 3 decimal places addition/subtraction
+      const places = 3;
+      const scale = 1000;
+      final a = _rand.nextInt(10000) / scale;
+      
+      if (operation == 0) {
+        // Addition
+        final b = _rand.nextInt(10000) / scale;
+        final ans = ((a + b) * scale).round() / scale;
+        final q = '${a.toStringAsFixed(places)} + ${b.toStringAsFixed(places)} = ?';
+        final opts = <double>{ans};
+        while (opts.length < 4) {
+          final v = ans + (_rand.nextInt(11) - 5) / scale;
+          opts.add(((v) * scale).round() / scale);
+        }
+        final list = opts.map((e) => e.toStringAsFixed(places)).toList()
+          ..shuffle(_rand);
+        final idx = list.indexOf(ans.toStringAsFixed(places));
+        return Question(question: q, options: list, answerIndex: idx);
+      } else {
+        // Subtraction
+        final b = _rand.nextInt((a * scale).toInt() + 1) / scale;
+        final ans = ((a - b) * scale).round() / scale;
+        final q = '${a.toStringAsFixed(places)} - ${b.toStringAsFixed(places)} = ?';
+        final opts = <double>{ans};
+        while (opts.length < 4) {
+          final v = ans + (_rand.nextInt(11) - 5) / scale;
+          opts.add(((v) * scale).round() / scale);
+        }
+        final list = opts.map((e) => e.toStringAsFixed(places)).toList()
+          ..shuffle(_rand);
+        final idx = list.indexOf(ans.toStringAsFixed(places));
+        return Question(question: q, options: list, answerIndex: idx);
+      }
     } else {
-      // Multiply decimal by 1-digit integer
+      // Advanced: 2-3 decimal places with multiplication
       const places = 2;
       const scale = 100;
       final a = _rand.nextInt(1000) / scale;
@@ -720,6 +791,218 @@ class QuestionGenerator {
     list.shuffle(_rand);
     final idx = list.indexOf(answer);
     return (list, idx);
+  }
+
+  // Decimals multiplication with two decimals
+  Question _genDecimalsMultiplication(int level) {
+    final places = level <= 10 ? 1 : 2;
+    final scale = level <= 10 ? 10 : 100;
+    
+    final a = _rand.nextInt(level <= 10 ? 100 : 1000) / scale;
+    final b = _rand.nextInt(level <= 10 ? 100 : 1000) / scale;
+    final ans = ((a * b) * scale * scale).round() / (scale * scale);
+    
+    final q = '${a.toStringAsFixed(places)} × ${b.toStringAsFixed(places)} = ?';
+    final opts = <double>{ans};
+    while (opts.length < 4) {
+      final v = ans + (_rand.nextInt(11) - 5) / (scale * scale);
+      opts.add(((v) * scale * scale).round() / (scale * scale));
+    }
+    final ansPlaces = level <= 10 ? 2 : 4;
+    final list = opts.map((e) => e.toStringAsFixed(ansPlaces)).toList()
+      ..shuffle(_rand);
+    final idx = list.indexOf(ans.toStringAsFixed(ansPlaces));
+    return Question(question: q, options: list, answerIndex: idx);
+  }
+
+  // Decimals division
+  Question _genDecimalsDivision(int level) {
+    final places = level <= 10 ? 1 : 2;
+    final scale = level <= 10 ? 10 : 100;
+    
+    // Generate a quotient and divisor, then calculate dividend
+    final quotient = _rand.nextInt(level <= 10 ? 50 : 100) / scale;
+    final divisor = _rand.nextInt(level <= 10 ? 50 : 100) / scale;
+    
+    // Ensure divisor is not too small
+    final actualDivisor = divisor < 0.1 ? 0.1 + divisor : divisor;
+    
+    final dividend = ((quotient * actualDivisor) * scale * scale).round() / (scale * scale);
+    final ans = quotient;
+    
+    final q = '${dividend.toStringAsFixed(places * 2)} ÷ ${actualDivisor.toStringAsFixed(places)} = ?';
+    final opts = <double>{ans};
+    while (opts.length < 4) {
+      final v = ans + (_rand.nextInt(11) - 5) / scale;
+      opts.add(((v) * scale).round() / scale);
+    }
+    final list = opts.map((e) => e.toStringAsFixed(places)).toList()
+      ..shuffle(_rand);
+    final idx = list.indexOf(ans.toStringAsFixed(places));
+    return Question(question: q, options: list, answerIndex: idx);
+  }
+
+  // Like fractions (same denominator) addition/subtraction
+  Question _genLikeFractions(int level) {
+    final denom = 2 + _rand.nextInt(10); // denominator 2-11
+    final num1 = 1 + _rand.nextInt(denom);
+    final num2 = 1 + _rand.nextInt(denom);
+    
+    // 50% addition, 50% subtraction
+    final isAddition = _rand.nextBool();
+    final ansNum = isAddition ? num1 + num2 : (num1 > num2 ? num1 - num2 : num2 - num1);
+    final ansDenom = denom;
+    
+    // Simplify the answer
+    final g = _gcd(ansNum, ansDenom);
+    final simplifiedNum = ansNum ~/ g;
+    final simplifiedDenom = ansDenom ~/ g;
+    
+    final correct = simplifiedDenom == 1 
+        ? simplifiedNum.toString() 
+        : '$simplifiedNum/$simplifiedDenom';
+    
+    final q = isAddition 
+        ? '$num1/$denom + $num2/$denom = ?'
+        : num1 > num2 
+            ? '$num1/$denom - $num2/$denom = ?'
+            : '$num2/$denom - $num1/$denom = ?';
+    
+    final options = _shuffleStringOptions(correct, () {
+      // Generate distractor fractions
+      final distNum = m.max(1, simplifiedNum + (_rand.nextInt(5) - 2));
+      final distDenom = m.max(1, simplifiedDenom + (_rand.nextInt(3) - 1));
+      return distDenom == 1 ? distNum.toString() : '$distNum/$distDenom';
+    });
+    
+    return Question(
+      question: q,
+      options: options.$1,
+      answerIndex: options.$2,
+    );
+  }
+
+  // Unlike fractions (different denominators) addition/subtraction
+  Question _genUnlikeFractions(int level) {
+    final denom1 = 2 + _rand.nextInt(6); // denominator 2-7
+    final denom2 = 2 + _rand.nextInt(6); // denominator 2-7
+    
+    // Ensure different denominators
+    final actualDenom2 = denom1 == denom2 ? denom2 + 1 : denom2;
+    
+    final num1 = 1 + _rand.nextInt(denom1);
+    final num2 = 1 + _rand.nextInt(actualDenom2);
+    
+    // Find LCD and convert to like fractions
+    final lcm = (denom1 * actualDenom2) ~/ _gcd(denom1, actualDenom2);
+    final convertedNum1 = num1 * (lcm ~/ denom1);
+    final convertedNum2 = num2 * (lcm ~/ actualDenom2);
+    
+    // 50% addition, 50% subtraction
+    final isAddition = _rand.nextBool();
+    final ansNum = isAddition 
+        ? convertedNum1 + convertedNum2 
+        : (convertedNum1 > convertedNum2 ? convertedNum1 - convertedNum2 : convertedNum2 - convertedNum1);
+    final ansDenom = lcm;
+    
+    // Simplify the answer
+    final g = _gcd(ansNum, ansDenom);
+    final simplifiedNum = ansNum ~/ g;
+    final simplifiedDenom = ansDenom ~/ g;
+    
+    final correct = simplifiedDenom == 1 
+        ? simplifiedNum.toString() 
+        : '$simplifiedNum/$simplifiedDenom';
+    
+    final q = isAddition 
+        ? '$num1/$denom1 + $num2/$actualDenom2 = ?'
+        : convertedNum1 > convertedNum2
+            ? '$num1/$denom1 - $num2/$actualDenom2 = ?'
+            : '$num2/$actualDenom2 - $num1/$denom1 = ?';
+    
+    final options = _shuffleStringOptions(correct, () {
+      // Generate distractor fractions
+      final distNum = m.max(1, simplifiedNum + (_rand.nextInt(7) - 3));
+      final distDenom = m.max(1, simplifiedDenom + (_rand.nextInt(5) - 2));
+      return distDenom == 1 ? distNum.toString() : '$distNum/$distDenom';
+    });
+    
+    return Question(
+      question: q,
+      options: options.$1,
+      answerIndex: options.$2,
+    );
+  }
+
+  // Multiplication of fractions
+  Question _genFractionsMultiplication(int level) {
+    final denom1 = 2 + _rand.nextInt(8); // denominator 2-9
+    final denom2 = 2 + _rand.nextInt(8); // denominator 2-9
+    final num1 = 1 + _rand.nextInt(denom1);
+    final num2 = 1 + _rand.nextInt(denom2);
+    
+    final ansNum = num1 * num2;
+    final ansDenom = denom1 * denom2;
+    
+    // Simplify the answer
+    final g = _gcd(ansNum, ansDenom);
+    final simplifiedNum = ansNum ~/ g;
+    final simplifiedDenom = ansDenom ~/ g;
+    
+    final correct = simplifiedDenom == 1 
+        ? simplifiedNum.toString() 
+        : '$simplifiedNum/$simplifiedDenom';
+    
+    final q = '$num1/$denom1 × $num2/$denom2 = ?';
+    
+    final options = _shuffleStringOptions(correct, () {
+      // Generate distractor fractions
+      final distNum = m.max(1, simplifiedNum + (_rand.nextInt(7) - 3));
+      final distDenom = m.max(1, simplifiedDenom + (_rand.nextInt(5) - 2));
+      return distDenom == 1 ? distNum.toString() : '$distNum/$distDenom';
+    });
+    
+    return Question(
+      question: q,
+      options: options.$1,
+      answerIndex: options.$2,
+    );
+  }
+
+  // Division of fractions
+  Question _genFractionsDivision(int level) {
+    final denom1 = 2 + _rand.nextInt(8); // denominator 2-9
+    final denom2 = 2 + _rand.nextInt(8); // denominator 2-9
+    final num1 = 1 + _rand.nextInt(denom1);
+    final num2 = 1 + _rand.nextInt(denom2);
+    
+    // Division is multiplication by reciprocal: (a/b) ÷ (c/d) = (a/b) × (d/c)
+    final ansNum = num1 * denom2;
+    final ansDenom = denom1 * num2;
+    
+    // Simplify the answer
+    final g = _gcd(ansNum, ansDenom);
+    final simplifiedNum = ansNum ~/ g;
+    final simplifiedDenom = ansDenom ~/ g;
+    
+    final correct = simplifiedDenom == 1 
+        ? simplifiedNum.toString() 
+        : '$simplifiedNum/$simplifiedDenom';
+    
+    final q = '$num1/$denom1 ÷ $num2/$denom2 = ?';
+    
+    final options = _shuffleStringOptions(correct, () {
+      // Generate distractor fractions
+      final distNum = m.max(1, simplifiedNum + (_rand.nextInt(7) - 3));
+      final distDenom = m.max(1, simplifiedDenom + (_rand.nextInt(5) - 2));
+      return distDenom == 1 ? distNum.toString() : '$distNum/$distDenom';
+    });
+    
+    return Question(
+      question: q,
+      options: options.$1,
+      answerIndex: options.$2,
+    );
   }
 
   int _gcd(int a, int b) {
