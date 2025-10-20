@@ -724,8 +724,8 @@ class QuestionGenerator {
 
   // Decimals comparison questions
   Question _genDecimalsComparison(int level) {
-    const places = level <= 10 ? 1 : 2;
-    const scale = level <= 10 ? 10 : 100;
+    final places = level <= 10 ? 1 : 2;
+    final scale = level <= 10 ? 10 : 100;
     final a = _rand.nextInt(100) / scale;
     final b = _rand.nextInt(100) / scale;
     final correct = a > b ? a.toStringAsFixed(places) : b.toStringAsFixed(places);
