@@ -13,14 +13,26 @@ class NameEntryScreen extends ConsumerStatefulWidget {
 
 class _NameEntryScreenState extends ConsumerState<NameEntryScreen> {
   final _controller = TextEditingController();
+  bool _navigated = false;
 
   @override
   void initState() {
     super.initState();
-    // If a name is already stored, skip this screen.
+    // Navigate away as soon as a saved name is available (now or later).
+    ref.listen<String?>(playerNameProvider, (prev, next) {
+      if (!_navigated && next != null && next.isNotEmpty && mounted) {
+        _navigated = true;
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const TopicSelectScreen()),
+        );
+      }
+    });
+    // Also handle the case where the value is already present immediately.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final saved = ref.read(playerNameProvider);
-      if (saved != null && saved.isNotEmpty && mounted) {
+      if (!_navigated && saved != null && saved.isNotEmpty && mounted) {
+        _navigated = true;
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (_) => const TopicSelectScreen()),

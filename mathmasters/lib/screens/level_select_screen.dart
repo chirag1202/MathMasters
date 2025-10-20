@@ -14,8 +14,9 @@ class LevelSelectScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final name = ref.watch(playerNameProvider) ?? 'Player';
-    // Remember the last selected topics for consistent Home navigation.
-    ref.read(lastSelectedTopicsProvider.notifier).state = selected;
+    final normalizedTopics = List<Topic>.from(selected)
+      ..sort((a, b) => a.key.compareTo(b.key));
+    ref.read(lastSelectedTopicsProvider.notifier).state = normalizedTopics;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Choose Level'),
@@ -31,7 +32,9 @@ class LevelSelectScreen extends ConsumerWidget {
         ],
       ),
       body: FutureBuilder<int>(
-        future: ref.read(persistenceProvider).getHighestUnlockedLevel(name),
+        future: ref
+            .read(persistenceProvider)
+            .getHighestUnlockedLevel(name, normalizedTopics),
         builder: (context, snap) {
           final unlocked = snap.data ?? 1;
           return GridView.builder(
@@ -61,10 +64,8 @@ class LevelSelectScreen extends ConsumerWidget {
                         await ref
                             .read(quizProvider.notifier)
                             .startQuiz(topics: selected, level: level);
-                        // Also store topics here (redundant but safe) in case
-                        // Level Select was reached via another path.
                         ref.read(lastSelectedTopicsProvider.notifier).state =
-                            selected;
+                            normalizedTopics;
                         if (!context.mounted) return;
                         Navigator.push(
                           context,

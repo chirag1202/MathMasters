@@ -28,7 +28,8 @@ class PlayerNameNotifier extends StateNotifier<String?> {
   static const _key = 'player_name';
   Future<void> _load() async {
     final p = await SharedPreferences.getInstance();
-    state = p.getString(_key);
+    final stored = p.getString(_key);
+    state = (stored == null || stored.isEmpty) ? '' : stored;
   }
 
   Future<void> setName(String name) async {

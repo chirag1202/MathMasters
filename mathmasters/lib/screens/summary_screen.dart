@@ -104,10 +104,17 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
                             // unlock next level
                             final p = ref.read(persistenceProvider);
                             final currentUnlocked = await p
-                                .getHighestUnlockedLevel(name);
+                                .getHighestUnlockedLevel(
+                                  name,
+                                  s.selectedTopics,
+                                );
                             final nextLevel = s.level + 1;
                             if (nextLevel > currentUnlocked) {
-                              await p.setHighestUnlockedLevel(name, nextLevel);
+                              await p.setHighestUnlockedLevel(
+                                name,
+                                s.selectedTopics,
+                                nextLevel,
+                              );
                             }
                           }
 

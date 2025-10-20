@@ -6,6 +6,8 @@ import 'screens/name_entry_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/scoreboard_screen.dart';
 import 'providers/settings_provider.dart';
+import 'providers/quiz_provider.dart';
+import 'screens/topic_select_screen.dart';
 
 void main() {
   runApp(const ProviderScope(child: MyApp()));
@@ -35,12 +37,27 @@ class MyApp extends ConsumerWidget {
         theme: light,
         darkTheme: dark,
         themeMode: mode,
-        home: const NameEntryScreen(),
+        home: _StartRouter(),
         routes: {
           '/settings': (_) => const SettingsScreen(),
           '/scoreboard': (_) => const ScoreboardScreen(),
         },
       ),
     );
+  }
+}
+
+class _StartRouter extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final name = ref.watch(playerNameProvider);
+    if (name == null) {
+      // Still loading from SharedPreferences
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+    if (name.isEmpty) {
+      return const NameEntryScreen();
+    }
+    return const TopicSelectScreen();
   }
 }

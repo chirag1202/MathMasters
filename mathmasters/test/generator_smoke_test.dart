@@ -1,4 +1,4 @@
-import 'package:test/test.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:mathmasters/data/question_generator.dart';
 import 'package:mathmasters/models/question.dart';
 
