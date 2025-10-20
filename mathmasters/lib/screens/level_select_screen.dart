@@ -7,15 +7,35 @@ import '../providers/persistence_provider.dart';
 import 'quiz_screen.dart';
 import 'topic_select_screen.dart';
 
-class LevelSelectScreen extends ConsumerWidget {
+class LevelSelectScreen extends ConsumerStatefulWidget {
   final List<Topic> selected;
   const LevelSelectScreen({super.key, required this.selected});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final name = ref.watch(playerNameProvider) ?? 'Player';
-    final normalizedTopics = List<Topic>.from(selected)
+  ConsumerState<LevelSelectScreen> createState() => _LevelSelectScreenState();
+}
+
+class _LevelSelectScreenState extends ConsumerState<LevelSelectScreen> {
+  late Future<int> _unlockedLevelFuture;
+  late List<Topic> normalizedTopics;
+
+  @override
+  void initState() {
+    super.initState();
+    normalizedTopics = List<Topic>.from(widget.selected)
       ..sort((a, b) => a.key.compareTo(b.key));
+    _loadUnlockedLevel();
+  }
+
+  void _loadUnlockedLevel() {
+    final name = ref.read(playerNameProvider) ?? 'Player';
+    _unlockedLevelFuture = ref
+        .read(persistenceProvider)
+        .getHighestUnlockedLevel(name, normalizedTopics);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     ref.read(lastSelectedTopicsProvider.notifier).state = normalizedTopics;
     return Scaffold(
       appBar: AppBar(
@@ -32,9 +52,7 @@ class LevelSelectScreen extends ConsumerWidget {
         ],
       ),
       body: FutureBuilder<int>(
-        future: ref
-            .read(persistenceProvider)
-            .getHighestUnlockedLevel(name, normalizedTopics),
+        future: _unlockedLevelFuture,
         builder: (context, snap) {
           final unlocked = snap.data ?? 1;
           return GridView.builder(
@@ -63,7 +81,7 @@ class LevelSelectScreen extends ConsumerWidget {
                     : () async {
                         await ref
                             .read(quizProvider.notifier)
-                            .startQuiz(topics: selected, level: level);
+                            .startQuiz(topics: normalizedTopics, level: level);
                         ref.read(lastSelectedTopicsProvider.notifier).state =
                             normalizedTopics;
                         if (!context.mounted) return;

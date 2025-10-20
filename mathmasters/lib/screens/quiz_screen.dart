@@ -42,7 +42,7 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
 
   void _handleAnswer(int index) {
     final s = ref.read(quizProvider);
-    if (s == null || s.finished) return;
+    if (s == null || s.finished || s.isPaused) return;
     final q = s.currentQuestion!;
 
     setState(() {
@@ -227,7 +227,7 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
                     text: q.options[i],
                     isCorrect: isC,
                     isWrong: isW,
-                    onTap: selectedIndex == null
+                    onTap: selectedIndex == null && !s.isPaused
                         ? () => _handleAnswer(i)
                         : () {},
                   );
