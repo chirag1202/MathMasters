@@ -1,5 +1,7 @@
 # MathMasters
 
+[![Build and Commit APK](https://github.com/chirag1202/MathMasters/actions/workflows/build-apk.yml/badge.svg)](https://github.com/chirag1202/MathMasters/actions/workflows/build-apk.yml)
+
 A Flutter-based math learning application for kids.
 
 ## Project Structure
