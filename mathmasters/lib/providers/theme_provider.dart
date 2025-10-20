@@ -65,7 +65,10 @@ ThemeData buildLightTheme() {
       scrim: Colors.black45,
     ),
     scaffoldBackgroundColor: const Color(0xFFFFF8E1),
-    appBarTheme: const AppBarTheme(foregroundColor: Colors.white),
+    appBarTheme: const AppBarTheme(
+      foregroundColor: Colors.white,
+      backgroundColor: orange,
+    ),
     useMaterial3: true,
     visualDensity: VisualDensity.comfortable,
   );

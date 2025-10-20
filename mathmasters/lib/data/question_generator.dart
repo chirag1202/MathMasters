@@ -27,19 +27,58 @@ class QuestionGenerator {
   }
 
   Question? _generateForTopic(Topic topic, int level) {
+    // Add variety by randomly choosing different question formats
+    final formatChoice = _rand.nextInt(100);
+    
     switch (topic) {
       case Topic.addition:
-        return _genAddition(level);
+        // 70% standard, 15% comparison, 15% word problem
+        if (formatChoice < 70) {
+          return _genAddition(level);
+        } else if (formatChoice < 85) {
+          return _genAdditionComparison(level);
+        } else {
+          return _genAdditionWordProblem(level);
+        }
       case Topic.subtraction:
-        return _genSubtraction(level);
+        // 70% standard, 15% comparison, 15% word problem
+        if (formatChoice < 70) {
+          return _genSubtraction(level);
+        } else if (formatChoice < 85) {
+          return _genSubtractionComparison(level);
+        } else {
+          return _genSubtractionWordProblem(level);
+        }
       case Topic.multiplication:
-        return _genMultiplication(level);
+        // 70% standard, 15% comparison, 15% pattern
+        if (formatChoice < 70) {
+          return _genMultiplication(level);
+        } else if (formatChoice < 85) {
+          return _genMultiplicationComparison(level);
+        } else {
+          return _genMultiplicationPattern(level);
+        }
       case Topic.division:
-        return _genDivision(level);
+        // 70% standard, 30% remainder or word problem
+        if (formatChoice < 70) {
+          return _genDivision(level);
+        } else {
+          return _genDivisionWithRemainder(level);
+        }
       case Topic.decimals:
-        return _genDecimals(level);
+        // 80% standard, 20% comparison
+        if (formatChoice < 80) {
+          return _genDecimals(level);
+        } else {
+          return _genDecimalsComparison(level);
+        }
       case Topic.fractions:
-        return _genFractions(level);
+        // 70% standard, 30% comparison
+        if (formatChoice < 70) {
+          return _genFractions(level);
+        } else {
+          return _genFractionsComparison(level);
+        }
     }
   }
 
@@ -49,13 +88,25 @@ class QuestionGenerator {
 
   Question _genAddition(int level) {
     // Increase operands and add more addends with level
+    // Add variety in question format
+    final formatVariant = _rand.nextInt(3);
+    
     if (level >= 15) {
       final lim = _rangeMax(level, base: 50, step: 25, cap: 500);
       final a = _rand.nextInt(lim + 1);
       final b = _rand.nextInt(lim + 1);
       final c = _rand.nextInt(lim + 1);
       final ans = a + b + c;
-      final q = '$a + $b + $c = ?';
+      
+      String q;
+      if (formatVariant == 0) {
+        q = '$a + $b + $c = ?';
+      } else if (formatVariant == 1) {
+        q = 'What is the sum of $a, $b and $c?';
+      } else {
+        q = 'Calculate: $a + $b + $c';
+      }
+      
       final options = _shuffleOptions(
         ans,
         () => ans + (_rand.nextInt(41) - 20),
@@ -71,7 +122,16 @@ class QuestionGenerator {
       final b = _rand.nextInt(lim + 1);
       final c = _rand.nextInt(20);
       final ans = a + b + c;
-      final q = '$a + $b + $c = ?';
+      
+      String q;
+      if (formatVariant == 0) {
+        q = '$a + $b + $c = ?';
+      } else if (formatVariant == 1) {
+        q = 'Add $a + $b + $c';
+      } else {
+        q = 'Find the sum: $a + $b + $c';
+      }
+      
       final options = _shuffleOptions(
         ans,
         () => ans + (_rand.nextInt(21) - 10),
@@ -86,7 +146,16 @@ class QuestionGenerator {
       final a = _rand.nextInt(lim + 1);
       final b = _rand.nextInt(lim + 1);
       final ans = a + b;
-      final q = '$a + $b = ?';
+      
+      String q;
+      if (formatVariant == 0) {
+        q = '$a + $b = ?';
+      } else if (formatVariant == 1) {
+        q = 'What is $a plus $b?';
+      } else {
+        q = 'Add: $a + $b';
+      }
+      
       final options = _shuffleOptions(ans, () => ans + _rand.nextInt(9) - 4);
       return Question(
         question: q,
@@ -97,6 +166,8 @@ class QuestionGenerator {
   }
 
   Question _genSubtraction(int level) {
+    final formatVariant = _rand.nextInt(3);
+    
     if (level >= 12) {
       final lim = _rangeMax(level, base: 50, step: 25, cap: 500);
       final a = _rand.nextInt(lim + 1);
@@ -105,7 +176,16 @@ class QuestionGenerator {
       final x = a + b + c;
       final pick = _rand.nextInt(2) == 0 ? a : b;
       final ans = x - pick;
-      final q = '$x - $pick = ?';
+      
+      String q;
+      if (formatVariant == 0) {
+        q = '$x - $pick = ?';
+      } else if (formatVariant == 1) {
+        q = 'What is $x minus $pick?';
+      } else {
+        q = 'Subtract $pick from $x';
+      }
+      
       final options = _shuffleOptions(
         ans,
         () => ans + (_rand.nextInt(41) - 20),
@@ -120,8 +200,17 @@ class QuestionGenerator {
       final a = _rand.nextInt(lim + 1);
       final b = _rand.nextInt(a + 1); // ensure non-negative
       final ans = a - b;
-      final q = '$a - $b = ?';
-      final options = _shuffleOptions(ans, () => ans + _rand.nextInt(9) - 4);
+      
+      String q;
+      if (formatVariant == 0) {
+        q = '$a - $b = ?';
+      } else if (formatVariant == 1) {
+        q = 'Calculate: $a - $b';
+      } else {
+        q = 'What is the difference: $a - $b';
+      }
+      
+      final options = _shuffleOptions(ans, () => m.max(0, ans + _rand.nextInt(9) - 4));
       return Question(
         question: q,
         options: options.$1,
@@ -131,11 +220,22 @@ class QuestionGenerator {
   }
 
   Question _genMultiplication(int level) {
+    final formatVariant = _rand.nextInt(3);
+    
     if (level >= 13) {
       final a = 10 + _rand.nextInt(90); // 2-digit
       final b = 10 + _rand.nextInt(90); // 2-digit
       final ans = a * b;
-      final q = '$a × $b = ?';
+      
+      String q;
+      if (formatVariant == 0) {
+        q = '$a × $b = ?';
+      } else if (formatVariant == 1) {
+        q = 'Multiply $a by $b';
+      } else {
+        q = 'What is $a times $b?';
+      }
+      
       final options = _shuffleOptions(
         ans,
         () => ans + (a * (_rand.nextInt(5) - 2)),
@@ -149,7 +249,16 @@ class QuestionGenerator {
       final a = 10 + _rand.nextInt(90); // 2-digit
       final b = 1 + _rand.nextInt(12); // up to 12
       final ans = a * b;
-      final q = '$a × $b = ?';
+      
+      String q;
+      if (formatVariant == 0) {
+        q = '$a × $b = ?';
+      } else if (formatVariant == 1) {
+        q = 'Calculate: $a × $b';
+      } else {
+        q = 'What is the product of $a and $b?';
+      }
+      
       final options = _shuffleOptions(
         ans,
         () => ans + (a * (_rand.nextInt(5) - 2)),
@@ -164,7 +273,16 @@ class QuestionGenerator {
       final a = 1 + _rand.nextInt(lim);
       final b = 1 + _rand.nextInt(lim);
       final ans = a * b;
-      final q = '$a × $b = ?';
+      
+      String q;
+      if (formatVariant == 0) {
+        q = '$a × $b = ?';
+      } else if (formatVariant == 1) {
+        q = 'Multiply: $a × $b';
+      } else {
+        q = 'What is $a times $b?';
+      }
+      
       final options = _shuffleOptions(
         ans,
         () => ans + (_rand.nextInt(5) - 2) * a,
@@ -393,6 +511,183 @@ class QuestionGenerator {
         answerIndex: options.$2,
       );
     }
+  }
+
+  // Addition comparison questions
+  Question _genAdditionComparison(int level) {
+    final lim = _rangeMax(level, base: 10, step: 10, cap: 200);
+    final a = _rand.nextInt(lim + 1);
+    final b = _rand.nextInt(lim + 1);
+    final c = _rand.nextInt(lim + 1);
+    final d = _rand.nextInt(lim + 1);
+    final sum1 = a + b;
+    final sum2 = c + d;
+    final correct = sum1 > sum2 ? '$a + $b' : '$c + $d';
+    final q = 'Which is greater: $a + $b or $c + $d?';
+    final options = _shuffleStringOptions(correct, () {
+      return _rand.nextBool() ? '$a + $b' : '$c + $d';
+    });
+    return Question(
+      question: q,
+      options: options.$1,
+      answerIndex: options.$2,
+    );
+  }
+
+  // Addition word problem
+  Question _genAdditionWordProblem(int level) {
+    final lim = _rangeMax(level, base: 10, step: 10, cap: 100);
+    final a = _rand.nextInt(lim + 1);
+    final b = _rand.nextInt(lim + 1);
+    final ans = a + b;
+    final stories = [
+      'You have $a apples and get $b more. How many do you have?',
+      'There are $a cats and $b dogs. How many animals total?',
+      'A book has $a pages and another has $b pages. Total pages?',
+      'You collect $a coins and then $b more coins. How many coins?',
+    ];
+    final q = stories[_rand.nextInt(stories.length)];
+    final options = _shuffleOptions(ans, () => ans + _rand.nextInt(9) - 4);
+    return Question(
+      question: q,
+      options: options.$1,
+      answerIndex: options.$2,
+    );
+  }
+
+  // Subtraction comparison questions
+  Question _genSubtractionComparison(int level) {
+    final lim = _rangeMax(level, base: 10, step: 10, cap: 200);
+    final a = _rand.nextInt(lim + 1);
+    final b = _rand.nextInt(a + 1);
+    final c = _rand.nextInt(lim + 1);
+    final d = _rand.nextInt(c + 1);
+    final diff1 = a - b;
+    final diff2 = c - d;
+    final correct = diff1 < diff2 ? '$a - $b' : '$c - $d';
+    final q = 'Which is smaller: $a - $b or $c - $d?';
+    final options = _shuffleStringOptions(correct, () {
+      return _rand.nextBool() ? '$a - $b' : '$c - $d';
+    });
+    return Question(
+      question: q,
+      options: options.$1,
+      answerIndex: options.$2,
+    );
+  }
+
+  // Subtraction word problem
+  Question _genSubtractionWordProblem(int level) {
+    final lim = _rangeMax(level, base: 10, step: 10, cap: 100);
+    final a = _rand.nextInt(lim + 1);
+    final b = _rand.nextInt(a + 1);
+    final ans = a - b;
+    final stories = [
+      'You have $a candies and eat $b. How many are left?',
+      'There are $a birds and $b fly away. How many remain?',
+      'A box has $a toys. You give away $b. How many left?',
+      'You have \$$a and spend \$$b. How much is left?',
+    ];
+    final q = stories[_rand.nextInt(stories.length)];
+    final options = _shuffleOptions(ans, () => m.max(0, ans + _rand.nextInt(9) - 4));
+    return Question(
+      question: q,
+      options: options.$1,
+      answerIndex: options.$2,
+    );
+  }
+
+  // Multiplication comparison questions
+  Question _genMultiplicationComparison(int level) {
+    final lim = m.max(5, m.min(12, 5 + level));
+    final a = 1 + _rand.nextInt(lim);
+    final b = 1 + _rand.nextInt(lim);
+    final c = 1 + _rand.nextInt(lim);
+    final d = 1 + _rand.nextInt(lim);
+    final prod1 = a * b;
+    final prod2 = c * d;
+    final correct = prod1 > prod2 ? '$a × $b' : '$c × $d';
+    final q = 'Which is greater: $a × $b or $c × $d?';
+    final options = _shuffleStringOptions(correct, () {
+      return _rand.nextBool() ? '$a × $b' : '$c × $d';
+    });
+    return Question(
+      question: q,
+      options: options.$1,
+      answerIndex: options.$2,
+    );
+  }
+
+  // Multiplication pattern questions
+  Question _genMultiplicationPattern(int level) {
+    final base = 1 + _rand.nextInt(12);
+    final step = 1 + _rand.nextInt(5);
+    final start = base * step;
+    final seq = [start, start + base, start + base * 2];
+    final ans = start + base * 3;
+    final q = 'What comes next: ${seq[0]}, ${seq[1]}, ${seq[2]}, ?';
+    final options = _shuffleOptions(ans, () => ans + (_rand.nextInt(11) - 5) * base);
+    return Question(
+      question: q,
+      options: options.$1,
+      answerIndex: options.$2,
+    );
+  }
+
+  // Division with remainder
+  Question _genDivisionWithRemainder(int level) {
+    final lim = m.max(5, m.min(12, 5 + level));
+    final b = 2 + _rand.nextInt(lim);
+    final quotient = 1 + _rand.nextInt(lim);
+    final remainder = _rand.nextInt(b);
+    final a = quotient * b + remainder;
+    final ans = remainder;
+    final q = 'What is the remainder when $a ÷ $b?';
+    final options = _shuffleOptions(ans, () => m.max(0, _rand.nextInt(b)));
+    return Question(
+      question: q,
+      options: options.$1,
+      answerIndex: options.$2,
+    );
+  }
+
+  // Decimals comparison questions
+  Question _genDecimalsComparison(int level) {
+    const places = level <= 10 ? 1 : 2;
+    const scale = level <= 10 ? 10 : 100;
+    final a = _rand.nextInt(100) / scale;
+    final b = _rand.nextInt(100) / scale;
+    final correct = a > b ? a.toStringAsFixed(places) : b.toStringAsFixed(places);
+    final q = 'Which is larger: ${a.toStringAsFixed(places)} or ${b.toStringAsFixed(places)}?';
+    final options = _shuffleStringOptions(correct, () {
+      return _rand.nextBool()
+          ? a.toStringAsFixed(places)
+          : b.toStringAsFixed(places);
+    });
+    return Question(
+      question: q,
+      options: options.$1,
+      answerIndex: options.$2,
+    );
+  }
+
+  // Fractions comparison questions
+  Question _genFractionsComparison(int level) {
+    final denom = 2 + _rand.nextInt(8);
+    final num1 = 1 + _rand.nextInt(denom - 1);
+    final num2 = 1 + _rand.nextInt(denom - 1);
+    final frac1 = num1 / denom;
+    final frac2 = num2 / denom;
+    final correct = frac1 > frac2 ? '$num1/$denom' : '$num2/$denom';
+    final q = 'Which is larger: $num1/$denom or $num2/$denom?';
+    final options = _shuffleStringOptions(correct, () {
+      return _rand.nextBool() ? '$num1/$denom' : '$num2/$denom';
+    });
+    return Question(
+      question: q,
+      options: options.$1,
+      answerIndex: options.$2,
+    );
   }
 
   // returns shuffled options and index of correct answer
