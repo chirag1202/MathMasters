@@ -8,6 +8,8 @@ class QuestionsRepository {
   Map<String, dynamic>? _raw;
 
   Future<void> load() async {
+    // Only load if not already loaded (idempotent)
+    if (_raw != null) return;
     final jsonStr = await rootBundle.loadString('assets/questions.json');
     _raw = json.decode(jsonStr) as Map<String, dynamic>;
   }
