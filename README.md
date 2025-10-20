@@ -23,20 +23,23 @@ This repository includes an automated CI/CD pipeline that builds and commits APK
 2. **Build Process**:
    - Sets up Java 17 and Flutter 3.24.0
    - Installs project dependencies
-   - Builds a release APK for Android
+   - Builds release APKs split per ABI (architecture) for optimal app size
 
 3. **APK Storage**:
    - APKs are stored in the `releases/` directory
-   - Two files are created per build:
-     - `mathmasters-<timestamp>.apk` - Timestamped version
-     - `mathmasters-latest.apk` - Always points to the most recent build
+   - Multiple APK files are created per build for different architectures:
+     - `app-armeabi-v7a-release-<timestamp>.apk` / `app-armeabi-v7a-release-latest.apk` (32-bit ARM)
+     - `app-arm64-v8a-release-<timestamp>.apk` / `app-arm64-v8a-release-latest.apk` (64-bit ARM)
+     - `app-x86_64-release-<timestamp>.apk` / `app-x86_64-release-latest.apk` (64-bit x86)
 
 4. **Auto-commit**: The pipeline automatically commits the generated APK files back to the repository
 
 ### Getting the Latest APK
 
-Download the latest APK from the `releases/` directory:
-- `releases/mathmasters-latest.apk` - Most recent build
+Download the appropriate APK from the `releases/` directory based on your device architecture:
+- `releases/app-arm64-v8a-release-latest.apk` - Most recent build for 64-bit ARM devices (most modern Android phones)
+- `releases/app-armeabi-v7a-release-latest.apk` - Most recent build for 32-bit ARM devices (older Android phones)
+- `releases/app-x86_64-release-latest.apk` - Most recent build for 64-bit x86 devices (Android emulators/tablets)
 
 ### Local Development
 
@@ -49,7 +52,15 @@ To build the APK manually:
 ```bash
 cd mathmasters
 flutter pub get
+# Build split APKs per architecture (recommended for smaller file sizes)
+flutter build apk --split-per-abi --release
+# Or build a universal APK (larger file size, works on all architectures)
 flutter build apk --release
 ```
 
-The APK will be located at: `mathmasters/build/app/outputs/flutter-apk/app-release.apk`
+Split APKs will be located at:
+- `mathmasters/build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk` (32-bit ARM)
+- `mathmasters/build/app/outputs/flutter-apk/app-arm64-v8a-release.apk` (64-bit ARM)
+- `mathmasters/build/app/outputs/flutter-apk/app-x86_64-release.apk` (64-bit x86)
+
+Universal APK will be located at: `mathmasters/build/app/outputs/flutter-apk/app-release.apk`
