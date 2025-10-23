@@ -17,19 +17,25 @@ class LevelSelectScreen extends ConsumerStatefulWidget {
 }
 
 class _LevelSelectScreenState extends ConsumerState<LevelSelectScreen> {
-  late Future<int> _unlockedLevelFuture;
+  Future<int>? _unlockedLevelFuture;
   late List<Topic> normalizedTopics;
+  bool _initialized = false;
 
   @override
   void initState() {
     super.initState();
     normalizedTopics = List<Topic>.from(widget.selected)
       ..sort((a, b) => a.key.compareTo(b.key));
-    ref.read(lastSelectedTopicsProvider.notifier).state = normalizedTopics;
-    _loadUnlockedLevel();
   }
 
-  void _loadUnlockedLevel() {
+  void _initializeProviders() {
+    if (_initialized) return;
+    _initialized = true;
+    
+    // Update the last selected topics provider
+    ref.read(lastSelectedTopicsProvider.notifier).state = normalizedTopics;
+    
+    // Load unlocked level
     final gameMode = ref.read(gameModeProvider);
     final name = gameMode.mode == GameMode.multiplayer && gameMode.player1Name != null
         ? gameMode.player1Name!
@@ -41,6 +47,9 @@ class _LevelSelectScreenState extends ConsumerState<LevelSelectScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Initialize providers on first build
+    _initializeProviders();
+    
     return Scaffold(
       appBar: AppBar(
         title: const Text('Choose Level'),
@@ -62,7 +71,9 @@ class _LevelSelectScreenState extends ConsumerState<LevelSelectScreen> {
           const AppBarThemeToggle(),
         ],
       ),
-      body: FutureBuilder<int>(
+      body: _unlockedLevelFuture == null
+          ? const Center(child: CircularProgressIndicator())
+          : FutureBuilder<int>(
         future: _unlockedLevelFuture,
         builder: (context, snap) {
           final unlocked = snap.data ?? 1;
