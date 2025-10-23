@@ -22,6 +22,13 @@ class _TopicSelectScreenState extends ConsumerState<TopicSelectScreen> {
         title: const Text('Pick Topics'),
         actions: [
           IconButton(
+            tooltip: 'Game History',
+            icon: const Icon(Icons.history),
+            onPressed: () {
+              Navigator.pushNamed(context, '/history');
+            },
+          ),
+          IconButton(
             tooltip: 'Home',
             icon: const Icon(Icons.home),
             onPressed: () {

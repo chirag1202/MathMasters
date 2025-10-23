@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'providers/theme_provider.dart';
+import 'screens/mode_select_screen.dart';
 import 'screens/name_entry_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/scoreboard_screen.dart';
+import 'screens/history_screen.dart';
 import 'providers/settings_provider.dart';
 import 'providers/quiz_provider.dart';
 import 'screens/topic_select_screen.dart';
@@ -41,6 +43,7 @@ class MyApp extends ConsumerWidget {
         routes: {
           '/settings': (_) => const SettingsScreen(),
           '/scoreboard': (_) => const ScoreboardScreen(),
+          '/history': (_) => const HistoryScreen(),
         },
       ),
     );
@@ -55,9 +58,7 @@ class _StartRouter extends ConsumerWidget {
       // Still loading from SharedPreferences
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
-    if (name.isEmpty) {
-      return const NameEntryScreen();
-    }
-    return const TopicSelectScreen();
+    // Always start with mode selection screen
+    return const ModeSelectScreen();
   }
 }

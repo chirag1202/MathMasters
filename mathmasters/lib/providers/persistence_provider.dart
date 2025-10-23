@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/player.dart';
 import '../models/question.dart';
+import '../models/game_history.dart';
 
 final persistenceProvider = Provider<PersistenceService>(
   (ref) => PersistenceService(),
@@ -12,6 +13,7 @@ final persistenceProvider = Provider<PersistenceService>(
 
 class PersistenceService {
   static const _scoreboardKey = 'scoreboard_entries';
+  static const _gameHistoryKey = 'game_history_entries';
 
   Future<int> getHighestUnlockedLevel(
     String playerName,
@@ -62,5 +64,22 @@ class PersistenceService {
         .map((e) => ScoreEntry.fromMap(jsonDecode(e) as Map<String, dynamic>))
         .toList()
       ..sort((a, b) => b.score.compareTo(a.score));
+  }
+
+  Future<void> addGameHistory(GameHistoryEntry entry) async {
+    final prefs = await SharedPreferences.getInstance();
+    final list = prefs.getStringList(_gameHistoryKey) ?? <String>[];
+    final jsonStr = jsonEncode(entry.toMap());
+    list.add(jsonStr);
+    await prefs.setStringList(_gameHistoryKey, list);
+  }
+
+  Future<List<GameHistoryEntry>> getGameHistory() async {
+    final prefs = await SharedPreferences.getInstance();
+    final list = prefs.getStringList(_gameHistoryKey) ?? <String>[];
+    return list
+        .map((e) => GameHistoryEntry.fromMap(jsonDecode(e) as Map<String, dynamic>))
+        .toList()
+      ..sort((a, b) => b.date.compareTo(a.date));
   }
 }
