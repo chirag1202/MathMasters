@@ -25,6 +25,7 @@ class _LevelSelectScreenState extends ConsumerState<LevelSelectScreen> {
     super.initState();
     normalizedTopics = List<Topic>.from(widget.selected)
       ..sort((a, b) => a.key.compareTo(b.key));
+    ref.read(lastSelectedTopicsProvider.notifier).state = normalizedTopics;
     _loadUnlockedLevel();
   }
 
@@ -40,7 +41,6 @@ class _LevelSelectScreenState extends ConsumerState<LevelSelectScreen> {
 
   @override
   Widget build(BuildContext context) {
-    ref.read(lastSelectedTopicsProvider.notifier).state = normalizedTopics;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Choose Level'),
