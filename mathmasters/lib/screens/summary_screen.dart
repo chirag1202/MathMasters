@@ -27,6 +27,35 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
   void initState() {
     super.initState();
     _confetti = ConfettiController(duration: const Duration(seconds: 2));
+    
+    // Handle multiplayer state updates after the first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final s = ref.read(quizProvider);
+      if (s == null) return;
+      
+      final gameMode = ref.read(gameModeProvider);
+      final isMultiplayer = gameMode.mode == GameMode.multiplayer;
+      final total = s.questions.length;
+      final correct = s.correctCount;
+      final score = calculateScore(
+        correctAnswers: correct,
+        timeRemaining: s.timeRemaining,
+      );
+      final pass = total == 0 ? false : (correct / total) >= 0.8;
+      
+      if (isMultiplayer && gameMode.isPlayer1Turn) {
+        // Player 1 just finished
+        ref.read(gameModeProvider.notifier).setPlayer1Result(score, s.timeRemaining);
+        if (pass) _confetti.play();
+        _showPlayer1CompleteDialog(context, ref, s, score);
+      } else if (isMultiplayer && !gameMode.isPlayer1Turn) {
+        // Player 2 just finished
+        ref.read(gameModeProvider.notifier).setPlayer2Result(score, s.timeRemaining);
+        if (pass) _confetti.play();
+      } else if (pass) {
+        _confetti.play();
+      }
+    });
   }
 
   @override
@@ -48,25 +77,6 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
       timeRemaining: s.timeRemaining,
     );
     final pass = total == 0 ? false : (correct / total) >= 0.8;
-
-    // Handle multiplayer flow
-    if (isMultiplayer && gameMode.isPlayer1Turn) {
-      // Player 1 just finished
-      ref.read(gameModeProvider.notifier).setPlayer1Result(score, s.timeRemaining);
-      
-      // Show player 1 results and prompt for player 2
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (pass) _confetti.play();
-        _showPlayer1CompleteDialog(context, ref, s, score);
-      });
-    } else if (isMultiplayer && !gameMode.isPlayer1Turn) {
-      // Player 2 just finished
-      ref.read(gameModeProvider.notifier).setPlayer2Result(score, s.timeRemaining);
-    }
-
-    if (pass) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => _confetti.play());
-    }
 
     return Scaffold(
       appBar: AppBar(
