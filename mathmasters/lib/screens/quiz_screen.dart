@@ -116,6 +116,15 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
           title: Text('Level ${s.level}'),
           actions: [
             IconButton(
+              tooltip: 'Game History',
+              icon: const Icon(Icons.history),
+              onPressed: () async {
+                ref.read(quizProvider.notifier).pause();
+                Navigator.pushNamed(context, '/history');
+                ref.read(quizProvider.notifier).resume();
+              },
+            ),
+            IconButton(
               tooltip: 'Home',
               icon: const Icon(Icons.home),
               onPressed: () async {

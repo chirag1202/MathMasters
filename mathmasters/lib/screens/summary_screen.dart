@@ -75,6 +75,13 @@ class _SummaryScreenState extends ConsumerState<SummaryScreen> {
             : 'Level Summary'),
         actions: [
           IconButton(
+            tooltip: 'Game History',
+            icon: const Icon(Icons.history),
+            onPressed: () {
+              Navigator.pushNamed(context, '/history');
+            },
+          ),
+          IconButton(
             tooltip: 'Home',
             icon: const Icon(Icons.home),
             onPressed: () => _goHome(context, ref),

@@ -4,6 +4,7 @@ import '../models/question.dart';
 import 'topic_select_screen.dart' show AppBarThemeToggle;
 import '../providers/quiz_provider.dart';
 import '../providers/persistence_provider.dart';
+import '../providers/game_mode_provider.dart';
 import 'quiz_screen.dart';
 import 'topic_select_screen.dart';
 
@@ -28,7 +29,10 @@ class _LevelSelectScreenState extends ConsumerState<LevelSelectScreen> {
   }
 
   void _loadUnlockedLevel() {
-    final name = ref.read(playerNameProvider) ?? 'Player';
+    final gameMode = ref.read(gameModeProvider);
+    final name = gameMode.mode == GameMode.multiplayer && gameMode.player1Name != null
+        ? gameMode.player1Name!
+        : (ref.read(playerNameProvider) ?? 'Player');
     _unlockedLevelFuture = ref
         .read(persistenceProvider)
         .getHighestUnlockedLevel(name, normalizedTopics);
@@ -41,6 +45,13 @@ class _LevelSelectScreenState extends ConsumerState<LevelSelectScreen> {
       appBar: AppBar(
         title: const Text('Choose Level'),
         actions: [
+          IconButton(
+            tooltip: 'Game History',
+            icon: const Icon(Icons.history),
+            onPressed: () {
+              Navigator.pushNamed(context, '/history');
+            },
+          ),
           IconButton(
             tooltip: 'Home',
             icon: const Icon(Icons.home),
