@@ -17,6 +17,13 @@ class ScoreboardScreen extends ConsumerWidget {
         title: const Text('Scoreboard'),
         actions: [
           IconButton(
+            tooltip: 'Game History',
+            icon: const Icon(Icons.history),
+            onPressed: () {
+              Navigator.pushNamed(context, '/history');
+            },
+          ),
+          IconButton(
             tooltip: 'Home',
             icon: const Icon(Icons.home),
             onPressed: () => _goHome(context, ref),
