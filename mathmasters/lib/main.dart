@@ -30,22 +30,26 @@ class MyApp extends ConsumerWidget {
     );
 
     final settings = ref.watch(settingsProvider);
-    return MediaQuery(
-      data: MediaQuery.of(
-        context,
-      ).copyWith(textScaler: TextScaler.linear(settings.textScale)),
-      child: MaterialApp(
-        title: 'MathQuest Kids',
-        theme: light,
-        darkTheme: dark,
-        themeMode: mode,
-        home: _StartRouter(),
-        routes: {
-          '/settings': (_) => const SettingsScreen(),
-          '/scoreboard': (_) => const ScoreboardScreen(),
-          '/history': (_) => const HistoryScreen(),
-        },
-      ),
+    return MaterialApp(
+      title: 'MathQuest Kids',
+      theme: light,
+      darkTheme: dark,
+      themeMode: mode,
+      home: _StartRouter(),
+      routes: {
+        '/settings': (_) => const SettingsScreen(),
+        '/scoreboard': (_) => const ScoreboardScreen(),
+        '/history': (_) => const HistoryScreen(),
+      },
+      builder: (context, child) {
+        final mediaQuery = MediaQuery.of(context);
+        return MediaQuery(
+          data: mediaQuery.copyWith(
+            textScaler: TextScaler.linear(settings.textScale),
+          ),
+          child: child!,
+        );
+      },
     );
   }
 }
